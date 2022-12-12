@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	str := "a4bc2d5e"
+	str := `qwe\\\3`
 
 	unpackedString, err := hw02unpackstring.Unpack(str)
 

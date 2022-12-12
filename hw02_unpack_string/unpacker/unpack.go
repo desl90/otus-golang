@@ -2,9 +2,9 @@ package hw02unpackstring
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 	"unicode"
-	"strconv"
 )
 
 const escapeLetter = `\`
@@ -36,7 +36,7 @@ func Unpack(str string) (string, error) {
 				continue
 			}
 
-			if (previousLetter != 0) {
+			if previousLetter != 0 {
 				unpackedString.WriteRune(previousLetter)
 			}
 
@@ -62,7 +62,7 @@ func Unpack(str string) (string, error) {
 					continue
 				}
 			}
-			
+
 			multipliedLetter, isError := multipleLetter(letter, previousLetter)
 
 			if isError {
@@ -74,7 +74,7 @@ func Unpack(str string) (string, error) {
 		}
 	}
 
-	if (previousLetter != 0) {
+	if previousLetter != 0 {
 		unpackedString.WriteRune(previousLetter)
 	}
 
@@ -91,7 +91,7 @@ func isValidEscapeLetter(letter rune) bool {
 
 func isEscapedLetter(letter rune) bool {
 	return escapeLetter == string(letter)
-} 
+}
 
 func multipleLetter(letter, previousLetter rune) (string, bool) {
 	digit, errAtoi := strconv.Atoi(string(letter))
