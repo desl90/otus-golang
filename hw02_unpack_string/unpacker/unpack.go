@@ -54,7 +54,7 @@ func Unpack(str string) (string, error) {
 
 			continue
 		}
-			
+
 		unpackedString.WriteRune(previousLetter)
 		previousLetter = letter
 		isExcluded = false
@@ -77,7 +77,7 @@ func isValidEscapeLetter(letter rune) bool {
 
 func isEscapedLetter(letter rune) bool {
 	return escapeLetter == letter
-} 
+}
 
 func multipleLetter(letter, previousLetter rune) (string, bool) {
 	digit, errAtoi := strconv.Atoi(string(letter))
