@@ -17,19 +17,11 @@ func Unpack(str string) (string, error) {
 	var isExcluded bool
 
 	for i, letter := range str {
-		if !isValidLetter(letter) {
+		if !isValidLetter(letter) || (i == 0 && !isValidEscapeLetter(letter)) {
 			return "", ErrInvalidString
 		}
 
-		if i == 0 && !isValidEscapeLetter(letter) {
-			return "", ErrInvalidString
-		}
-
-		if !unicode.IsDigit(letter) && !isEscapedLetter(letter) && isExcluded {
-			return "", ErrInvalidString
-		}
-
-		if unicode.IsLetter(letter) && isExcluded {
+		if (!unicode.IsDigit(letter) && !isEscapedLetter(letter) && isExcluded) || (unicode.IsLetter(letter) && isExcluded) {
 			return "", ErrInvalidString
 		}
 
