@@ -50,7 +50,7 @@ func Unpack(str string) (string, error) {
 
 			unpackedString.WriteString(multipliedLetter)
 			previousLetter = 0
-			
+
 		default:
 			unpackedString.WriteRune(previousLetter)
 			previousLetter = letter
