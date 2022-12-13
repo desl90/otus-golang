@@ -17,28 +17,27 @@ func Unpack(str string) (string, error) {
 	var isExcluded bool
 
 	for i, letter := range str {
-		if !isValidLetter(letter) || (i == 0 && !isValidEscapeLetter(letter)) {
+		switch {
+		case !isValidLetter(letter):
 			return "", ErrInvalidString
-		}
 
-		if (!unicode.IsDigit(letter) && !isEscapedLetter(letter) && isExcluded) || (unicode.IsLetter(letter) && isExcluded) {
+		case i == 0 && !isValidEscapeLetter(letter):
 			return "", ErrInvalidString
-		}
 
-		if isEscapedLetter(letter) && !isExcluded {
+		case !unicode.IsDigit(letter) && !isEscapedLetter(letter) && isExcluded:
+			return "", ErrInvalidString
+
+		case unicode.IsLetter(letter) && isExcluded:
+			return "", ErrInvalidString
+
+		case isEscapedLetter(letter) && !isExcluded:
 			isExcluded = true
 
-			continue
-		}
-
-		if previousLetter == 0 && (!unicode.IsDigit(letter) || isExcluded) {
+		case previousLetter == 0 && (!unicode.IsDigit(letter) || isExcluded):
 			previousLetter = letter
 			isExcluded = false
 
-			continue
-		}
-
-		if unicode.IsDigit(letter) && !isExcluded {
+		case unicode.IsDigit(letter) && !isExcluded:
 			if previousLetter == 0 {
 				return "", ErrInvalidString
 			}
@@ -51,13 +50,12 @@ func Unpack(str string) (string, error) {
 
 			unpackedString.WriteString(multipliedLetter)
 			previousLetter = 0
-
-			continue
+			
+		default:
+			unpackedString.WriteRune(previousLetter)
+			previousLetter = letter
+			isExcluded = false
 		}
-
-		unpackedString.WriteRune(previousLetter)
-		previousLetter = letter
-		isExcluded = false
 	}
 
 	if previousLetter != 0 {
