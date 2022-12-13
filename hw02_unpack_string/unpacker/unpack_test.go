@@ -44,3 +44,13 @@ func TestUnpackInvalidString(t *testing.T) {
 	}
 }
 
+func TestUnpackInvalidLetterInString(t *testing.T) {
+	invalidStrings := []string{"!123", "45 45", "~123456!~", "\\~24"}
+	for _, tc := range invalidStrings {
+		tc := tc
+		t.Run(tc, func(t *testing.T) {
+			_, err := Unpack(tc)
+			require.Truef(t, errors.Is(err, ErrInvalidString), "actual error %q", err)
+		})
+	}
+}
