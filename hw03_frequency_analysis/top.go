@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type WordCount struct {
+type wordCount struct {
 	word  string
 	count int
 }
@@ -24,7 +24,7 @@ func Top10(str string) []string {
 	return getTopWords(wordsCount)
 }
 
-func getTopWords(wordsCount []WordCount) []string {
+func getTopWords(wordsCount []wordCount) []string {
 	maxLength := 10
 	wordsCountLength := len(wordsCount)
 	var topWords []string
@@ -40,11 +40,11 @@ func getTopWords(wordsCount []WordCount) []string {
 	return topWords
 }
 
-func getWordsCount(wordsCountMap map[string]int) []WordCount {
-	wordsCount := make([]WordCount, 0)
+func getWordsCount(wordsCountMap map[string]int) []wordCount {
+	wordsCount := make([]wordCount, 0)
 
 	for word, count := range wordsCountMap {
-		wordsCount = append(wordsCount, WordCount{word, count})
+		wordsCount = append(wordsCount, wordCount{word, count})
 	}
 
 	return wordsCount
