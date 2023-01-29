@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
-	ErrInvalidJobs         = errors.New("invalid count jobs")
+	ErrErrorsLimitExceeded   = errors.New("errors limit exceeded")
+	ErrInvalidCountConsumers = errors.New("invalid count consumers")
 )
 
 type Task func() error
@@ -33,7 +33,7 @@ func (err *ErrCount) Decrement() {
 
 func Run(tasks []Task, n, m int) error {
 	if n < 1 {
-		return ErrInvalidJobs
+		return ErrInvalidCountConsumers
 	}
 
 	if m < 1 {
@@ -44,38 +44,15 @@ func Run(tasks []Task, n, m int) error {
 		return nil
 	}
 
-	wg := sync.WaitGroup{}
+	wg := &sync.WaitGroup{}
+	chanTaskSize := 10
 	errCount := ErrCount{
 		count: m,
 	}
 
-	ch := make(chan Task, len(tasks))
-
-	for _, task := range tasks {
-		ch <- task
-	}
-
-	close(ch)
-
-	job := func(ch <-chan Task) {
-		defer wg.Done()
-
-		for task := range ch {
-			if errCount.Count() < 1 {
-				return
-			}
-
-			if err := task(); err != nil {
-				errCount.Decrement()
-			}
-		}
-	}
-
-	wg.Add(n)
-
-	for i := 0; i < n; i++ {
-		go job(ch)
-	}
+	chanTasks := chanFactory(chanTaskSize)
+	produce(chanTasks, &tasks, wg)
+	consume(chanTasks, n, &errCount, wg)
 
 	wg.Wait()
 
@@ -84,4 +61,47 @@ func Run(tasks []Task, n, m int) error {
 	}
 
 	return nil
+}
+
+func consume(chanTasks <-chan Task, n int, errCount *ErrCount, wg *sync.WaitGroup) {
+	for i := 0; i < n; i++ {
+		wg.Add(1)
+
+		go consumer(chanTasks, errCount, wg)
+	}
+}
+
+func consumer(chanTasks <-chan Task, errCount *ErrCount, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for task := range chanTasks {
+		if errCount.Count() < 1 {
+			return
+		}
+
+		if err := task(); err != nil {
+			errCount.Decrement()
+		}
+	}
+}
+
+func produce(chanTasks chan<- Task, tasks *[]Task, wg *sync.WaitGroup) {
+	wg.Add(1)
+
+	go producer(chanTasks, tasks, wg)
+}
+
+func producer(chanTasks chan<- Task, tasks *[]Task, wg *sync.WaitGroup) {
+	defer wg.Done()
+	defer close(chanTasks)
+
+	for _, task := range *tasks {
+		chanTasks <- task
+	}
+}
+
+func chanFactory(chanTaskSize int) chan Task {
+	chanTasks := make(chan Task, chanTaskSize)
+
+	return chanTasks
 }

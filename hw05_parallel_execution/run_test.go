@@ -68,7 +68,7 @@ func TestRun(t *testing.T) {
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
 
-	t.Run("invalid count jobs", func(t *testing.T) {
+	t.Run("invalid count consumers", func(t *testing.T) {
 		tasksCount := 50
 		tasks := make([]Task, 0, tasksCount)
 
@@ -87,7 +87,7 @@ func TestRun(t *testing.T) {
 		maxErrorsCount := 1
 
 		result := Run(tasks, workersCount, maxErrorsCount)
-		require.Equal(t, ErrInvalidJobs, result)
+		require.Equal(t, ErrInvalidCountConsumers, result)
 		require.Equal(t, runTasksCount, int32(0), "not all tasks were completed")
 	})
 
