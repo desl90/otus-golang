@@ -44,17 +44,14 @@ func Run(tasks []Task, n, m int) error {
 		return nil
 	}
 
-	wg := &sync.WaitGroup{}
-	chanTaskSize := 10
+	chanTasksSize := 10
 	errCount := ErrCount{
 		count: m,
 	}
 
-	chanTasks := chanFactory(chanTaskSize)
-	produce(chanTasks, &tasks, wg)
-	consume(chanTasks, n, &errCount, wg)
-
-	wg.Wait()
+	chanTasks := chanFactory(chanTasksSize)
+	produce(chanTasks, &tasks)
+	consume(chanTasks, n, &errCount)
 
 	if errCount.Count() < 1 {
 		return ErrErrorsLimitExceeded
@@ -63,12 +60,16 @@ func Run(tasks []Task, n, m int) error {
 	return nil
 }
 
-func consume(chanTasks <-chan Task, n int, errCount *ErrCount, wg *sync.WaitGroup) {
+func consume(chanTasks <-chan Task, n int, errCount *ErrCount) {
+	wg := &sync.WaitGroup{}
+
 	for i := 0; i < n; i++ {
 		wg.Add(1)
 
 		go consumer(chanTasks, errCount, wg)
 	}
+
+	wg.Wait()
 }
 
 func consumer(chanTasks <-chan Task, errCount *ErrCount, wg *sync.WaitGroup) {
@@ -85,14 +86,11 @@ func consumer(chanTasks <-chan Task, errCount *ErrCount, wg *sync.WaitGroup) {
 	}
 }
 
-func produce(chanTasks chan<- Task, tasks *[]Task, wg *sync.WaitGroup) {
-	wg.Add(1)
-
-	go producer(chanTasks, tasks, wg)
+func produce(chanTasks chan<- Task, tasks *[]Task) {
+	go producer(chanTasks, tasks)
 }
 
-func producer(chanTasks chan<- Task, tasks *[]Task, wg *sync.WaitGroup) {
-	defer wg.Done()
+func producer(chanTasks chan<- Task, tasks *[]Task) {
 	defer close(chanTasks)
 
 	for _, task := range *tasks {
@@ -100,8 +98,8 @@ func producer(chanTasks chan<- Task, tasks *[]Task, wg *sync.WaitGroup) {
 	}
 }
 
-func chanFactory(chanTaskSize int) chan Task {
-	chanTasks := make(chan Task, chanTaskSize)
+func chanFactory(size int) chan Task {
+	chanTasks := make(chan Task, size)
 
 	return chanTasks
 }
