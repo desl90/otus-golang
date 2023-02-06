@@ -67,4 +67,58 @@ func TestRun(t *testing.T) {
 		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
+
+	t.Run("invalid count consumers", func(t *testing.T) {
+		tasksCount := 50
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				atomic.AddInt32(&runTasksCount, 1)
+				return nil
+			})
+		}
+
+		workersCount := 0
+		maxErrorsCount := 1
+
+		result := Run(tasks, workersCount, maxErrorsCount)
+		require.Equal(t, ErrInvalidCountConsumers, result)
+		require.Equal(t, runTasksCount, int32(0), "not all tasks were completed")
+	})
+
+	t.Run("errors limit exceeded", func(t *testing.T) {
+		tasksCount := 50
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			tasks = append(tasks, func() error {
+				time.Sleep(taskSleep)
+				atomic.AddInt32(&runTasksCount, 1)
+				return nil
+			})
+		}
+
+		workersCount := 5
+		maxErrorsCount := 0
+
+		result := Run(tasks, workersCount, maxErrorsCount)
+		require.Equal(t, ErrErrorsLimitExceeded, result)
+		require.Equal(t, runTasksCount, int32(0), "not all tasks were completed")
+	})
+
+	t.Run("empty tasks", func(t *testing.T) {
+		workersCount := 5
+		maxErrorsCount := 1
+
+		result := Run([]Task{}, workersCount, maxErrorsCount)
+		require.Nil(t, result)
+	})
 }
