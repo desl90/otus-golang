@@ -26,7 +26,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 
 	fromFile, err := os.Open(fromPath)
-
 	if err != nil {
 		return err
 	}
@@ -38,7 +37,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}()
 
 	seekPosition, err := fromFile.Seek(offset, io.SeekStart)
-
 	if err != nil {
 		return err
 	}
@@ -62,7 +60,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	readerBar := bar.NewProxyReader(reader)
 
 	toFile, err := os.Create(toPath)
-
 	if err != nil {
 		return err
 	}

@@ -16,7 +16,7 @@ func TestCopy(t *testing.T) {
 
 	t.Run("File not found", func(t *testing.T) {
 		fromPath = "./testdata/none.txt"
-		toPath = "./file.txt"
+		toPath = "./test1.txt"
 
 		result := Copy(fromPath, toPath, offset, limit)
 
@@ -27,7 +27,7 @@ func TestCopy(t *testing.T) {
 
 	t.Run("Unsupported file", func(t *testing.T) {
 		fromPath = "/dev/urandom"
-		toPath = "./file.txt"
+		toPath = "./test2.txt"
 
 		result := Copy(fromPath, toPath, offset, limit)
 
@@ -38,7 +38,7 @@ func TestCopy(t *testing.T) {
 
 	t.Run("Offset exceeds file size", func(t *testing.T) {
 		fromPath = "./testdata/offset_exceed.txt"
-		toPath = "./file.txt"
+		toPath = "./test3.txt"
 		offset = 5000
 
 		result := Copy(fromPath, toPath, offset, limit)
@@ -50,7 +50,7 @@ func TestCopy(t *testing.T) {
 
 	t.Run("Success copy file", func(t *testing.T) {
 		fromPath = "./testdata/input.txt"
-		toPath = "./file.txt"
+		toPath = "./test4.txt"
 
 		result := Copy(fromPath, toPath, offset, limit)
 
