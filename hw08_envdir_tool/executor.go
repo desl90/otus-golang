@@ -38,7 +38,6 @@ func RunCmd(cmd []string, env Environment) (returnCode int) {
 		if err := os.Setenv(key, value.Value); err != nil {
 			return ExitCodeFail
 		}
-
 	}
 
 	if err := proc.Run(); err != nil {
