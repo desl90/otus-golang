@@ -226,10 +226,7 @@ func validateInt(value int, name, rules string) (errors ValidationErrors, err er
 		case ruleIn:
 			ruleValue := strings.Split(rule[1], ",")
 
-			ok, err := contains(ruleValue, value)
-			if err != nil {
-				return nil, err
-			}
+			ok, _ := contains(ruleValue, value)
 
 			if !ok {
 				errors = append(errors, newValidationError(name, ErrWrongValueNotIn))
