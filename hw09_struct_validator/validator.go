@@ -90,14 +90,14 @@ func Validate(v interface{}) error {
 				continue
 			}
 
+			rules, ok := value.Type().Field(i).Tag.Lookup(tag)
+			if !ok {
+				continue
+			}
+
 			intSlice, ok := value.Field(i).Interface().([]int)
 
 			if ok {
-				rules, ok := value.Type().Field(i).Tag.Lookup(tag)
-				if !ok {
-					continue
-				}
-
 				errorsValidation, err := validateIntSlice(intSlice, value.Type().Field(i).Name, rules)
 				if err != nil {
 					return err
@@ -109,11 +109,6 @@ func Validate(v interface{}) error {
 			stringSlice, ok := value.Field(i).Interface().([]string)
 
 			if ok {
-				rules, ok := value.Type().Field(i).Tag.Lookup(tag)
-				if !ok {
-					continue
-				}
-
 				errorsValidation, err := validateStringSlice(stringSlice, value.Type().Field(i).Name, rules)
 				if err != nil {
 					return err
