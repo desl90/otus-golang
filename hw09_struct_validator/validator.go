@@ -95,27 +95,12 @@ func Validate(v interface{}) error {
 				continue
 			}
 
-			intSlice, ok := value.Field(i).Interface().([]int)
-
-			if ok {
-				errorsValidation, err := validateIntSlice(intSlice, value.Type().Field(i).Name, rules)
-				if err != nil {
-					return err
-				}
-
-				errors = append(errors, errorsValidation...)
+			errorsValidation, err := validateSlice(value.Field(i).Interface(), value.Type().Field(i).Name, rules)
+			if err != nil {
+				return err
 			}
 
-			stringSlice, ok := value.Field(i).Interface().([]string)
-
-			if ok {
-				errorsValidation, err := validateStringSlice(stringSlice, value.Type().Field(i).Name, rules)
-				if err != nil {
-					return err
-				}
-
-				errors = append(errors, errorsValidation...)
-			}
+			errors = append(errors, errorsValidation...)
 		}
 	}
 
@@ -124,6 +109,32 @@ func Validate(v interface{}) error {
 	}
 
 	return nil
+}
+
+func validateSlice(value interface{}, name, rules string) (errors ValidationErrors, err error) {
+	intSlice, ok := value.([]int)
+
+	if ok {
+		errorsValidation, err := validateIntSlice(intSlice, name, rules)
+		if err != nil {
+			return nil, err
+		}
+
+		errors = append(errors, errorsValidation...)
+	}
+
+	stringSlice, ok := value.([]string)
+
+	if ok {
+		errorsValidation, err := validateStringSlice(stringSlice, name, rules)
+		if err != nil {
+			return nil, err
+		}
+
+		errors = append(errors, errorsValidation...)
+	}
+
+	return errors, nil
 }
 
 func validateStringSlice(value []string, name, rules string) (errors ValidationErrors, err error) {
