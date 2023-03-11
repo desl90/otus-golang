@@ -68,11 +68,11 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			Task{ID: -1, title: "Test task", grade: -1},
-			errors.New("Id: wrong value less min"),
+			errors.New("ID: wrong value less min"),
 		},
 		{
 			Task{ID: 1000, title: "Test task", grade: -1},
-			errors.New("Id: wrong value more max"),
+			errors.New("ID: wrong value more max"),
 		},
 		{
 			Month{Summer: 4},
