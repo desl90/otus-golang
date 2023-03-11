@@ -39,7 +39,7 @@ type (
 	}
 
 	Task struct {
-		Id    int    `validate:"min:1|max:500"`
+		ID    int    `validate:"min:1|max:500"`
 		title string `validate:"min:6|max:255"`
 		grade int
 	}
@@ -63,15 +63,15 @@ func TestValidate(t *testing.T) {
 			ErrWrongType,
 		},
 		{
-			Task{Id: 300, title: "Test title", grade: -1},
+			Task{ID: 300, title: "Test title", grade: -1},
 			nil,
 		},
 		{
-			Task{Id: -1, title: "Test task", grade: -1},
+			Task{ID: -1, title: "Test task", grade: -1},
 			errors.New("Id: wrong value less min"),
 		},
 		{
-			Task{Id: 1000, title: "Test task", grade: -1},
+			Task{ID: 1000, title: "Test task", grade: -1},
 			errors.New("Id: wrong value more max"),
 		},
 		{
