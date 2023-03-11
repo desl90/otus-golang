@@ -86,38 +86,40 @@ func Validate(v interface{}) error {
 			errors = append(errors, errorsValidation...)
 
 		case "slice":
-			if value.Field(i).CanInterface() {
-				intSlice, ok := value.Field(i).Interface().([]int)
+			if !value.Field(i).CanInterface() {
+				continue
+			}
 
-				if ok {
-					rules, ok := value.Type().Field(i).Tag.Lookup(tag)
-					if !ok {
-						continue
-					}
+			intSlice, ok := value.Field(i).Interface().([]int)
 
-					errorsValidation, err := validateIntSlice(intSlice, value.Type().Field(i).Name, rules)
-					if err != nil {
-						return err
-					}
-
-					errors = append(errors, errorsValidation...)
+			if ok {
+				rules, ok := value.Type().Field(i).Tag.Lookup(tag)
+				if !ok {
+					continue
 				}
 
-				stringSlice, ok := value.Field(i).Interface().([]string)
-
-				if ok {
-					rules, ok := value.Type().Field(i).Tag.Lookup(tag)
-					if !ok {
-						continue
-					}
-
-					errorsValidation, err := validateStringSlice(stringSlice, value.Type().Field(i).Name, rules)
-					if err != nil {
-						return err
-					}
-
-					errors = append(errors, errorsValidation...)
+				errorsValidation, err := validateIntSlice(intSlice, value.Type().Field(i).Name, rules)
+				if err != nil {
+					return err
 				}
+
+				errors = append(errors, errorsValidation...)
+			}
+
+			stringSlice, ok := value.Field(i).Interface().([]string)
+
+			if ok {
+				rules, ok := value.Type().Field(i).Tag.Lookup(tag)
+				if !ok {
+					continue
+				}
+
+				errorsValidation, err := validateStringSlice(stringSlice, value.Type().Field(i).Name, rules)
+				if err != nil {
+					return err
+				}
+
+				errors = append(errors, errorsValidation...)
 			}
 		}
 	}
@@ -226,7 +228,10 @@ func validateInt(value int, name, rules string) (errors ValidationErrors, err er
 		case ruleIn:
 			ruleValue := strings.Split(rule[1], ",")
 
-			ok, _ := contains(ruleValue, value)
+			ok, err := contains(ruleValue, value)
+			if err != nil {
+				return nil, err
+			}
 
 			if !ok {
 				errors = append(errors, newValidationError(name, ErrWrongValueNotIn))
