@@ -27,7 +27,7 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 	user := &User{}
 	result := make(DomainStat)
 
-	reg, _ := regexp.Compile("(.*)@[^.]+\\." + domain)
+	reg, _ := regexp.Compile("(?m)(@)[^.]+\\." + domain)
 
 	for s.Scan() {
 		if err := easyjson.Unmarshal(s.Bytes(), user); err != nil {
