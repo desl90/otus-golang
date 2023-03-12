@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/mailru/easyjson"
+	jsoniter "github.com/json-iterator/go"
 )
 
 type User struct {
@@ -23,6 +23,7 @@ type User struct {
 type DomainStat map[string]int
 
 func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
 	s := bufio.NewScanner(r)
 	user := &User{}
 	result := make(DomainStat)
@@ -30,7 +31,7 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 	reg, _ := regexp.Compile("(.*)@[^.]+\\." + domain)
 
 	for s.Scan() {
-		if err := easyjson.Unmarshal(s.Bytes(), user); err != nil {
+		if err := json.Unmarshal(s.Bytes(), user); err != nil {
 			return nil, fmt.Errorf("error unmarshal user: %w", err)
 		}
 
