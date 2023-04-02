@@ -13,6 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const timeoutDefault = 10 * time.Second
+
 func TestTelnetClient(t *testing.T) {
 	t.Run("basic", func(t *testing.T) {
 		l, err := net.Listen("tcp", "127.0.0.1:")
@@ -155,7 +157,7 @@ func TestInitConfig(t *testing.T) {
 		t.Run(fmt.Sprintf("case %d: ", i), func(t *testing.T) {
 			tt := tt
 
-			config, err := initConfig(tt.host, tt.port, 10*time.Second)
+			config, err := initConfig(tt.host, tt.port, timeoutDefault)
 			require.Equal(t, tt.expectedSocket, config.socket)
 
 			if tt.expectedError != nil {

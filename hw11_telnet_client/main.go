@@ -29,7 +29,7 @@ type config struct {
 }
 
 func main() {
-	config, err := initConfig(getHostArg(), getPortArg(), getTimeoutArg())
+	config, err := initConfig(parseArg())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -124,19 +124,11 @@ func validatePort(port string) (string, error) {
 	return port, nil
 }
 
-func getTimeoutArg() time.Duration {
+func parseArg() (string, string, time.Duration) {
 	var timeout time.Duration
 
 	pflag.DurationVarP(&timeout, "timeout", "t", 10*time.Second, "")
 	pflag.Parse()
 
-	return timeout
-}
-
-func getPortArg() string {
-	return pflag.Arg(1)
-}
-
-func getHostArg() string {
-	return pflag.Arg(0)
+	return pflag.Arg(0), pflag.Arg(1), timeout
 }
